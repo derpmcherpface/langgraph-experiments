@@ -108,21 +108,23 @@ results = []
 
 
 #print(app.invoke(inputs))
-
+from termcolor import colored
 from langchain_core.tracers import ConsoleCallbackHandler
 
-for s in app.stream(inputs, config={'callbacks': [ConsoleCallbackHandler()]}):
+#for s in app.stream(inputs, config={'callbacks': [ConsoleCallbackHandler()]}):
+for s in app.stream(inputs):
     result = list(s.values())[0]
     results.append(result)
     print(result)
 
 
-
+# now parse with termcolor
 
 app.get_graph().print_ascii()
 graph=app.get_graph()
 
 for res in results:
     print("----")
+    res=colored(str(res),'blue')
     print(res)
 
