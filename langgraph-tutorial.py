@@ -14,6 +14,11 @@ def function_2(input_2):
     return input_2
 function2_runnable=RunnableLambda(function_2)
 
+def function_3(input_3):
+    print(input_3)
+    return input_3
+function_3_runnable=RunnableLambda(function_3)
+
 from langchain_community.chat_models import ChatOllama
 model = ChatOllama(model="openhermes")
 
@@ -26,11 +31,13 @@ workflow = Graph()
 print("adding nodes")
 workflow.add_node("node_1", function_1_runnable)
 workflow.add_node("node_2", function2_runnable)
-workflow.add_node("node_3", model) # models are runnables, i.e. valid nodes
+workflow.add_node("model_node", model) # models are runnables, i.e. valid nodes
+workflow.add_node("node_3", function_3_runnable)
 
 print("adding edges")
 workflow.add_edge('node_1', 'node_2')
-workflow.add_edge('node_2', 'node_3')
+workflow.add_edge('node_2', 'model_node')
+workflow.add_edge('model_node', 'node_3')
 
 workflow.set_entry_point("node_1")
 workflow.set_finish_point("node_3")
@@ -40,4 +47,4 @@ app = workflow.compile()
 
 print("invoking app")
 result=app.invoke("") # consider removing input to function_1
-print(result); 
+#print(result); 
