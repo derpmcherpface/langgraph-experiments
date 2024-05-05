@@ -4,6 +4,8 @@
 def function_1(input_1):
     result=input_1 + " Hi "
     return result
+from langchain_core.runnables import RunnableLambda
+function_1_runnable = RunnableLambda(function_1)
 
 def function_2(input_2):
     result=input_2 + " there "
@@ -14,7 +16,7 @@ from langgraph.graph import Graph
 # Define a Langchain graph
 workflow = Graph()
 
-workflow.add_node("node_1", function_1)
+workflow.add_node("node_1", function_1_runnable)
 workflow.add_node("node_2", function_2)
 
 workflow.add_edge('node_1', 'node_2')
