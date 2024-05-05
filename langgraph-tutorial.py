@@ -41,19 +41,3 @@ app = workflow.compile()
 print("invoking app")
 result=app.invoke("") # consider removing input to function_1
 print(result); 
-
-# Adding LLM Call 
-
-#from langchain_community.chat_models import ChatOllama
-
-#chat = ChatOllama(model="openhermes", streaming=False, callbacks=[])
-#print("creating model...")
-#model = ChatOllama(model="openhermes")
-
-#print("invoking model...")
-#result=model.invoke("Hey There")
-#result=app.invoke("Hey there")
-#print(result)
-#print(result.content)
-
-
