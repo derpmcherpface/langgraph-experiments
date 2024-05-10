@@ -19,19 +19,22 @@ def function_2(state):
     messages=state['messages']
     input_2=messages[-1]
     print("invoking model with question: " + input_2)
-    return input_2
+    return state
 function2_runnable=RunnableLambda(function_2)
 
 # model invocation node function
 def function_3(state):
-    response = model.invoke("Who was Napoleon?")
+    messages=state['messages']
+    input_2=messages[-1]
+    #response = model.invoke("Who was Napoleon?")
+    response = model.invoke(input_2)
     print("response: " + str(response))
     return state
 function_3_runnable=RunnableLambda(function_3)
 
 def router(state):
-    #return "node_1"
-    return "__end__"
+    return "node_1"
+    #return "__end__"
 
 # assing AgentState as an empty dict 
 AgentState = {}
