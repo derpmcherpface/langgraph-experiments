@@ -1,31 +1,47 @@
 # from: https://www.youtube.com/watch?v=R8KB-Zcynxc
 # and: https://github.com/menloparklab/LangGraphJourney/blob/main/LangGraphLearning.ipynb
-
-def function_1(input_1):
+from langchain_community.chat_models import ChatOllama
+model = ChatOllama(model="openhermes")
+# Input node function
+def function_1(state):
     #result=input_1 + " Hi "
     print("What is your question?")
-    result=input()
-    return result
+    #result=input()
+    result="Who was Napoleon?"
+    state['messages'].append(result)
+    return state
 from langchain_core.runnables import RunnableLambda
 function_1_runnable = RunnableLambda(function_1)
 
-def function_2(input_2):
+# State consistency check
+def function_2(state):
+    print("state: " + str(state))
+    messages=state['messages']
+    input_2=messages[-1]
     print("invoking model with question: " + input_2)
     return input_2
 function2_runnable=RunnableLambda(function_2)
 
-def function_3(input_3):
-    print(input_3)
-    return input_3
+# model invocation node function
+def function_3(state):
+    response = model.invoke("Who was Napoleon?")
+    print("response: " + str(response))
+    return state
 function_3_runnable=RunnableLambda(function_3)
 
-def router(input):
-    return "node_1"
-    #return "__end__"
+def router(state):
+    #return "node_1"
+    return "__end__"
+
+# assing AgentState as an empty dict 
+AgentState = {}
+# messages key will be assigned as an empty array. 
+# We will append new messages as we pass along nodes.
+AgentState["messages"] = []
 
 
-from langchain_community.chat_models import ChatOllama
-model = ChatOllama(model="openhermes")
+
+
 
 from langgraph.graph import Graph
 
@@ -36,13 +52,15 @@ workflow = Graph()
 print("adding nodes")
 workflow.add_node("node_1", function_1_runnable)
 workflow.add_node("node_2", function2_runnable)
-workflow.add_node("model_node", model) # models are runnables, i.e. valid nodes
+#workflow.add_node("model_node", model) # models are runnables, i.e. valid nodes
+
 workflow.add_node("node_3", function_3_runnable)
 
 print("adding edges")
 workflow.add_edge('node_1', 'node_2')
-workflow.add_edge('node_2', 'model_node')
-workflow.add_edge('model_node', 'node_3')
+#workflow.add_edge('node_2', 'model_node')
+#workflow.add_edge('model_node', 'node_3')
+workflow.add_edge('node_2', 'node_3')
 #workflow.add_edge('node_3', 'node_1')
 workflow.add_conditional_edges('node_3', router)
 
@@ -53,5 +71,6 @@ print("compiling workflow")
 app = workflow.compile()
 
 print("invoking app")
-result=app.invoke("") # consider removing input to function_1
+#result=app.invoke("") # consider removing input to function_1
+result=app.invoke(AgentState)
 #print(result); 
