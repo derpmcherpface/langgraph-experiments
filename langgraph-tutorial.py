@@ -38,9 +38,10 @@ print("adding edges")
 workflow.add_edge('node_1', 'node_2')
 workflow.add_edge('node_2', 'model_node')
 workflow.add_edge('model_node', 'node_3')
+workflow.add_edge('node_3', 'node_1')
 
 workflow.set_entry_point("node_1")
-workflow.set_finish_point("node_3")
+#workflow.set_finish_point("node_3")
 
 print("compiling workflow")
 app = workflow.compile()
