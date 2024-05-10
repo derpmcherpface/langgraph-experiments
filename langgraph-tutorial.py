@@ -19,6 +19,11 @@ def function_3(input_3):
     return input_3
 function_3_runnable=RunnableLambda(function_3)
 
+def router(input):
+    return "node_1"
+    #return "__end__"
+
+
 from langchain_community.chat_models import ChatOllama
 model = ChatOllama(model="openhermes")
 
@@ -38,7 +43,8 @@ print("adding edges")
 workflow.add_edge('node_1', 'node_2')
 workflow.add_edge('node_2', 'model_node')
 workflow.add_edge('model_node', 'node_3')
-workflow.add_edge('node_3', 'node_1')
+#workflow.add_edge('node_3', 'node_1')
+workflow.add_conditional_edges('node_3', router)
 
 workflow.set_entry_point("node_1")
 #workflow.set_finish_point("node_3")
