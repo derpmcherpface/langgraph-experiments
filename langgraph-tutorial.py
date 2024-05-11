@@ -1,6 +1,7 @@
 # from: https://www.youtube.com/watch?v=R8KB-Zcynxc
 # and: https://github.com/menloparklab/LangGraphJourney/blob/main/LangGraphLearning.ipynb
 from langchain_community.chat_models import ChatOllama
+from langchain_core.messages import AIMessage, HumanMessage
 model = ChatOllama(model="openhermes")
 # Input node function
 def function_1(state):
@@ -17,7 +18,8 @@ function_1_runnable = RunnableLambda(function_1)
 def function_3(state):
     print("state: " + str(state))
     messages=state['messages']
-    input_2=messages[-1]
+    input_2=messages[-1] # Create a proper prompt here instead with 
+    # context from the agent state
     print("input_2:" + input_2)
     #response = model.invoke("Who was Napoleon?")
     response = model.invoke(input_2)
