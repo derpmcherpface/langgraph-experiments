@@ -1,4 +1,4 @@
-
+from functools import partial
 # from: https://www.youtube.com/watch?v=R8KB-Zcynxc
 # and: https://github.com/menloparklab/LangGraphJourney/blob/main/LangGraphLearning.ipynb
 from langchain_community.chat_models import ChatOllama
@@ -24,7 +24,7 @@ def function_1(state):
 
 
 # model invocation node function
-def function_3(state):
+def function_3(model,state):
     print("state: " + str(state))
     messages=state['messages']
     #input_2=messages[-1] # Create a proper prompt here instead with 
@@ -61,7 +61,7 @@ def main():
 
     from langchain_core.runnables import RunnableLambda
     function_1_runnable = RunnableLambda(function_1)
-    function_3_runnable=RunnableLambda(function_3)
+    function_3_runnable=RunnableLambda(partial(function_3,model))
 
 
     print("Hello world!")
