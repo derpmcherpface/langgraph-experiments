@@ -1,3 +1,4 @@
+
 # from: https://www.youtube.com/watch?v=R8KB-Zcynxc
 # and: https://github.com/menloparklab/LangGraphJourney/blob/main/LangGraphLearning.ipynb
 from langchain_community.chat_models import ChatOllama
@@ -20,8 +21,7 @@ def function_1(state):
     state['messages'].append(result)
     state['question']=result
     return state
-from langchain_core.runnables import RunnableLambda
-function_1_runnable = RunnableLambda(function_1)
+
 
 # model invocation node function
 def function_3(state):
@@ -40,9 +40,9 @@ Context: {context}
 Question: {question}
 Answer:
 """
-)
+    )
     resulting_prompt=prompt_template.format(
-    context=state_to_context(AgentState), 
+    context=state_to_context(state), 
     question=state['question']
     )
     #print(state_to_context(AgentState))
@@ -51,39 +51,50 @@ Answer:
     response = model.invoke(str(resulting_prompt))
     print("response: " + str(response))
     return state
-function_3_runnable=RunnableLambda(function_3)
 
 def router(state):
     return "node_1"
     #return "__end__"
 
+def main(): 
+
+
+    from langchain_core.runnables import RunnableLambda
+    function_1_runnable = RunnableLambda(function_1)
+    function_3_runnable=RunnableLambda(function_3)
+
+
+    print("Hello world!")
+    AgentState = {}
+    # messages key will be assigned as an empty array. 
+    # We will append new messages as we pass along nodes.
+    AgentState["messages"] = []
+    AgentState["question"] = ""
+
+    from langgraph.graph import Graph
+
+    # Define a Langchain graph
+    print("creating workflow")
+    workflow = Graph()
+
+    print("adding nodes")
+    workflow.add_node("node_1", function_1_runnable)
+
+    workflow.add_node("node_3", function_3_runnable)
+
+    print("adding edges")
+    workflow.add_edge('node_1', 'node_3')
+    workflow.add_conditional_edges('node_3', router)
+    workflow.set_entry_point("node_1")
+    #workflow.set_finish_point("node_3")
+
+    print("compiling workflow")
+    app = workflow.compile()
+
+    print("invoking app")
+    result=app.invoke(AgentState)
+    #print(result); 
+
+if __name__ == "__main__":
+    main()
 # assing AgentState as an empty dict 
-AgentState = {}
-# messages key will be assigned as an empty array. 
-# We will append new messages as we pass along nodes.
-AgentState["messages"] = []
-AgentState["question"] = ""
-
-from langgraph.graph import Graph
-
-# Define a Langchain graph
-print("creating workflow")
-workflow = Graph()
-
-print("adding nodes")
-workflow.add_node("node_1", function_1_runnable)
-
-workflow.add_node("node_3", function_3_runnable)
-
-print("adding edges")
-workflow.add_edge('node_1', 'node_3')
-workflow.add_conditional_edges('node_3', router)
-workflow.set_entry_point("node_1")
-#workflow.set_finish_point("node_3")
-
-print("compiling workflow")
-app = workflow.compile()
-
-print("invoking app")
-result=app.invoke(AgentState)
-#print(result); 
