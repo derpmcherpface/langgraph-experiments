@@ -3,6 +3,14 @@
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import AIMessage, HumanMessage
 model = ChatOllama(model="openhermes")
+
+def state_to_context(state):
+    result=""
+    for message in state["messages"]:
+        result=result+'\n'+message
+
+    return result
+
 # Input node function
 def function_1(state):
     #result=input_1 + " Hi "
@@ -10,6 +18,7 @@ def function_1(state):
     result=input()
     #result="Who was Napoleon?"
     state['messages'].append(result)
+    state['question']=result
     return state
 from langchain_core.runnables import RunnableLambda
 function_1_runnable = RunnableLambda(function_1)
@@ -18,11 +27,28 @@ function_1_runnable = RunnableLambda(function_1)
 def function_3(state):
     print("state: " + str(state))
     messages=state['messages']
-    input_2=messages[-1] # Create a proper prompt here instead with 
+    #input_2=messages[-1] # Create a proper prompt here instead with 
+    input_2=state['question']
     # context from the agent state
     print("input_2:" + input_2)
+    from langchain_core.prompts import PromptTemplate
+    prompt_template = PromptTemplate.from_template(
+"""Give a short answer to the question given the context below
+---
+Context: {context}
+---
+Question: {question}
+Answer:
+"""
+)
+    resulting_prompt=prompt_template.format(
+    context=state_to_context(AgentState), 
+    question=state['question']
+    )
+    #print(state_to_context(AgentState))
+    print("prompt:" + str(resulting_prompt))
     #response = model.invoke("Who was Napoleon?")
-    response = model.invoke(input_2)
+    response = model.invoke(str(resulting_prompt))
     print("response: " + str(response))
     return state
 function_3_runnable=RunnableLambda(function_3)
@@ -36,6 +62,7 @@ AgentState = {}
 # messages key will be assigned as an empty array. 
 # We will append new messages as we pass along nodes.
 AgentState["messages"] = []
+AgentState["question"] = ""
 
 from langgraph.graph import Graph
 

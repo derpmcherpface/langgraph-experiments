@@ -31,13 +31,13 @@ def state_to_context(state):
 print(state_to_context(AgentState))
 
 prompt_template = PromptTemplate.from_template(
-    """Give a short answer to the question given the context below
-    ---
-    Context: {context}
-    ---
-    Question: {question}
-    Answer:
-    """
+"""Give a short answer to the question given the context below
+---
+Context: {context}
+---
+Question: {question}
+Answer:
+"""
 )
 #resulting_prompt=prompt_template.format(adjective="funny", content="chickens")
 resulting_prompt=prompt_template.format(
