@@ -10,9 +10,8 @@ class TestSumTest(unittest.TestCase):
         self.assertEqual(sum((1, 2, 3)), 6, "Should be 6")
 
 
-class CustomExecutorTest(unittest.TestCase):
-
-    customExecutor = CustomExecutor()
+    def test_init_custom_executor(self):
+        self.customExecutor = CustomExecutor()
 
 if __name__ == '__main__':
     unittest.main()
