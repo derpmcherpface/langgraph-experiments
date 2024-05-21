@@ -3,7 +3,7 @@ from functools import partial
 # and: https://github.com/menloparklab/LangGraphJourney/blob/main/LangGraphLearning.ipynb
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import AIMessage, HumanMessage
-model = ChatOllama(model="openhermes")
+
 
 def state_to_context(state):
     result=""
@@ -57,7 +57,7 @@ def router(state):
     #return "__end__"
 
 def main(): 
-
+    model = ChatOllama(model="openhermes")
 
     from langchain_core.runnables import RunnableLambda
     function_1_runnable = RunnableLambda(function_1)
