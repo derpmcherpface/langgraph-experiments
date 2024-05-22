@@ -12,6 +12,7 @@ class TestSumTest(unittest.TestCase):
 
     def test_init_custom_executor(self):
         self.customExecutor = CustomExecutor()
+        print("response: " + str(self.customExecutor.invoke_executor()))
 
 if __name__ == '__main__':
     unittest.main()
