@@ -3,8 +3,14 @@ from langchain_core.runnables import RunnableLambda
 from langgraph.graph import Graph
 import queue
 from functools import partial
+from langchain_core.prompts import PromptTemplate
 class CustomExecutor: 
+    def state_to_context(state):
+        result=""
+        for message in state["messages"]:
+            result=result+'\n'+message
 
+        return result
     # static methods used as nodes in the graph
     def input_node_fcn(state): 
         print("What is your question?")
@@ -16,6 +22,25 @@ class CustomExecutor:
     
     def invocation_node_fcn(model,state):
         print("running node invocation fcn")
+
+        prompt_template = PromptTemplate.from_template(
+"""Give a short answer to the question given the context below
+---
+Context: {context}
+---
+Question: {question}
+Answer:
+"""
+        )
+        resulting_prompt=prompt_template.format(
+        context=CustomExecutor.state_to_context(state), 
+        question=state['question']
+        )
+
+        print("prompt:" + str(resulting_prompt))
+
+        result = model.invoke(str(resulting_prompt))
+        print(result)
         return state
     
     def invoke_executor(self): 
