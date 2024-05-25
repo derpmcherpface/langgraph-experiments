@@ -1,5 +1,6 @@
 import unittest
 from custom_executor import CustomExecutor
+import timeout_decorator
 
 class TestSumTest(unittest.TestCase):
 
@@ -10,6 +11,7 @@ class TestSumTest(unittest.TestCase):
         self.assertEqual(sum((1, 2, 3)), 6, "Should be 6")
 
 
+    #@timeout_decorator.timeout(5)
     def test_init_custom_executor(self):
         self.customExecutor = CustomExecutor()
         print("response: " + str(self.customExecutor.invoke_executor()))

@@ -4,6 +4,7 @@ from langgraph.graph import Graph
 import queue
 from functools import partial
 from langchain_core.prompts import PromptTemplate
+import sys, select
 class CustomExecutor: 
     def state_to_context(state):
         result=""
@@ -11,11 +12,22 @@ class CustomExecutor:
             result=result+'\n'+message
 
         return result
+    
+    def input_with_timeout(timeout):
+        print("You have ten seconds to answer!")
+
+        i, o, e = select.select( [sys.stdin], [], [], 10 )
+
+        if (i):
+            print("You said " + sys.stdin.readline().strip())
+        else:
+            print("You said nothing!")
     # static methods used as nodes in the graph
     def input_node_fcn(state): 
         print("What is your question?")
         #result=input()
         result="hello world!"
+        CustomExecutor.input_with_timeout(10)
         state['messages'].append(result)
         state['question']=result
         return state
