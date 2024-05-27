@@ -14,6 +14,7 @@ class TestSumTest(unittest.TestCase):
     #@timeout_decorator.timeout(5)
     def test_init_custom_executor(self):
         self.customExecutor = CustomExecutor()
+        self.customExecutor.add_input("My carpet is green. What color is my carpet?")
         print("response: " + str(self.customExecutor.invoke_executor()))
 
 if __name__ == '__main__':

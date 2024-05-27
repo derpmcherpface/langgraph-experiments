@@ -5,6 +5,7 @@ import queue
 from functools import partial
 from langchain_core.prompts import PromptTemplate
 import sys, select
+
 class CustomExecutor: 
     def state_to_context(state):
         result=""
@@ -22,12 +23,17 @@ class CustomExecutor:
             print("You said " + sys.stdin.readline().strip())
         else:
             print("You said nothing!")
+
     # static methods used as nodes in the graph
     def input_node_fcn(state): 
         print("What is your question?")
         #result=input()
-        result="hello world!"
-        CustomExecutor.input_with_timeout(10)
+        if not state['input_queue'].empty():
+            result = state['input_queue'].get()
+        else:
+            result="hello world!"
+
+        #CustomExecutor.input_with_timeout(10)
         state['messages'].append(result)
         state['question']=result
         return state
@@ -57,6 +63,9 @@ Answer:
     
     def invoke_executor(self): 
         return self.app.invoke(self.AgentState)
+    
+    def add_input(self, message):
+        self.AgentState["input_queue"].put(message)
 
     def __init__(self):
         print("Starting initialize custom executor")
@@ -70,7 +79,7 @@ Answer:
         self.AgentState["messages"] = []
         self.AgentState["question"] = ""
 
-        self.input_queue = queue.Queue()
+        self.AgentState["input_queue"] = queue.Queue()
 
         self.workflow = Graph()
         self.workflow.add_node("input_node", self.input_node_runnable)
