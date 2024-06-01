@@ -2,7 +2,7 @@ import unittest
 from custom_executor import CustomExecutor
 import timeout_decorator
 
-class TestSumTest(unittest.TestCase):
+class CustomExecutorTests(unittest.TestCase):
 
     def test_init_custom_executor(self):
         self.customExecutor = CustomExecutor()

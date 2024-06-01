@@ -7,7 +7,7 @@ from langchain_core.prompts import PromptTemplate
 import sys, select
 
 class CustomExecutor: 
-    def state_to_context(state):
+    def state_to_context(state : dict):
         result=""
         for message in state["messages"]:
             result=result+'\n'+message
@@ -25,7 +25,7 @@ class CustomExecutor:
             print("You said nothing!")
 
     # static methods used as nodes in the graph
-    def input_node_fcn(state): 
+    def input_node_fcn(state: dict): 
         print("What is your question?")
         #result=input()
         if not state['input_queue'].empty():
@@ -38,7 +38,7 @@ class CustomExecutor:
         state['question']=result
         return state
     
-    def invocation_node_fcn(model,state):
+    def invocation_node_fcn(model,state: dict):
         print("running node invocation fcn")
 
         prompt_template = PromptTemplate.from_template(
@@ -67,7 +67,7 @@ Answer:
         result = self.app.invoke(self.AgentState)
         return result['messages'][-1] # return last response
     
-    def add_input(self, message):
+    def add_input(self, message : str):
         self.AgentState["input_queue"].put(message)
 
     def __init__(self):
@@ -96,7 +96,7 @@ Answer:
         print("Custom executor initialized")
 
 
-    def one_pass_execute(self, input) -> str:
+    def one_pass_execute(self, input: str) -> str:
         self.add_input(input)
         result = self.invoke_executor()
         return result
