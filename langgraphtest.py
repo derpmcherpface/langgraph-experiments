@@ -34,5 +34,10 @@ class TestSumTest(unittest.TestCase):
         else:
             self.assertTrue(False)
 
+    def test_one_pass_execute(self):
+        self.customExecutor = CustomExecutor()
+        result= self.customExecutor.one_pass_execute("test one pass execute")
+        print(result)
+
 if __name__ == '__main__':
     unittest.main()

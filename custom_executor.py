@@ -63,7 +63,7 @@ Answer:
         print(result)
         return state
     
-    def invoke_executor(self): 
+    def invoke_executor(self) -> str: 
         result = self.app.invoke(self.AgentState)
         return result['messages'][-1] # return last response
     
@@ -71,6 +71,7 @@ Answer:
         self.AgentState["input_queue"].put(message)
 
     def __init__(self):
+        
         print("Starting initialize custom executor")
         self.model = ChatOllama(model="openhermes")
         self.input_node_runnable = RunnableLambda(CustomExecutor.input_node_fcn)
@@ -95,3 +96,7 @@ Answer:
         print("Custom executor initialized")
 
 
+    def one_pass_execute(self, input) -> str:
+        self.add_input(input)
+        result = self.invoke_executor()
+        return result
