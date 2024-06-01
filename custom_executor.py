@@ -58,11 +58,14 @@ Answer:
         print("prompt:" + str(resulting_prompt))
 
         result = model.invoke(str(resulting_prompt))
+        # add result content to agent state
+        state['messages'].append(result.content)
         print(result)
         return state
     
     def invoke_executor(self): 
-        return self.app.invoke(self.AgentState)
+        result = self.app.invoke(self.AgentState)
+        return result['messages'][-1] # return last response
     
     def add_input(self, message):
         self.AgentState["input_queue"].put(message)
