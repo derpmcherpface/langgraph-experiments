@@ -31,7 +31,7 @@ class CustomExecutor:
         if not state['input_queue'].empty():
             result = state['input_queue'].get()
         else:
-            result="hello world!"
+            result=input()
 
         #CustomExecutor.input_with_timeout(10)
         state['messages'].append(result)
@@ -100,3 +100,11 @@ Answer:
         self.add_input(input)
         result = self.invoke()
         return result
+    
+def main():
+    print("hello world!")
+    customExecutor = CustomExecutor()
+    customExecutor.invoke()
+    
+if __name__ == "__main__":
+    main()
