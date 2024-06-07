@@ -63,6 +63,10 @@ Answer:
         print(result)
         return state
     
+    def should_continue(state):
+        #return "__end__"
+        return "input_node"
+    
     def invoke(self) -> str: 
         result = self.app.invoke(self.AgentState)
         return result['messages'][-1] # return last response
@@ -89,8 +93,11 @@ Answer:
         self.workflow.add_node("input_node", self.input_node_runnable)
         self.workflow.add_node("invocation_node", self.invocation_node_runnable)
         self.workflow.add_edge('input_node', 'invocation_node')
+        self.workflow.add_conditional_edges("invocation_node", CustomExecutor.should_continue)
+
+
         self.workflow.set_entry_point("input_node")
-        self.workflow.set_finish_point("invocation_node")
+        #self.workflow.set_finish_point("invocation_node")
         self.app = self.workflow.compile()
 
         print("Custom executor initialized")
