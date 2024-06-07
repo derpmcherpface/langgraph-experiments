@@ -63,7 +63,7 @@ Answer:
         print(result)
         return state
     
-    def invoke_executor(self) -> str: 
+    def invoke(self) -> str: 
         result = self.app.invoke(self.AgentState)
         return result['messages'][-1] # return last response
     
@@ -96,7 +96,7 @@ Answer:
         print("Custom executor initialized")
 
 
-    def one_pass_execute(self, input: str) -> str:
+    def one_pass_execute(self, input: str="My carpet is green. What color is my carpet?") -> str:
         self.add_input(input)
-        result = self.invoke_executor()
+        result = self.invoke()
         return result
