@@ -17,7 +17,7 @@ class CustomExecutor:
     def input_with_timeout(timeout):
         print("You have ten seconds to answer!")
 
-        i, o, e = select.select( [sys.stdin], [], [], 10 )
+        i, o, e = select.select( [sys.stdin], [], [], timeout)
 
         if (i):
             print("You said " + sys.stdin.readline().strip())
@@ -65,7 +65,12 @@ Answer:
     
     def should_continue(state):
         #return "__end__"
-        return "input_node"
+        if not state['input_queue'].empty() or state["human_input_mode"]:
+            print("input queue not empty or human input mode, returning to input_node")
+            return "input_node"
+        else:
+            print("input queue empty, returning to __end__")
+            return "__end__"
     
     def invoke(self) -> str: 
         result = self.app.invoke(self.AgentState)
@@ -73,6 +78,9 @@ Answer:
     
     def add_input(self, message : str):
         self.AgentState["input_queue"].put(message)
+
+    def set_human_input_mode(self, mode : bool):
+        self.AgentState["human_input_mode"] = mode
 
     def __init__(self):
         
@@ -100,6 +108,8 @@ Answer:
         #self.workflow.set_finish_point("invocation_node")
         self.app = self.workflow.compile()
 
+        self.AgentState["human_input_mode"] = False
+
         print("Custom executor initialized")
 
 
@@ -111,6 +121,7 @@ Answer:
 def main():
     print("hello world!")
     customExecutor = CustomExecutor()
+    customExecutor.set_human_input_mode(True)
     customExecutor.invoke()
     
 if __name__ == "__main__":
