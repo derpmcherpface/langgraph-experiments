@@ -5,8 +5,22 @@ import queue
 from functools import partial
 from langchain_core.prompts import PromptTemplate
 import sys, select
+from langchain_core.tools import tool
 
 class CustomExecutor: 
+
+    @tool
+    def multiply(a: int, b: int) -> int:
+        """Multiplies a and b.
+
+        Args:
+            a: first int
+            b: second int
+        """
+        return a * b
+
+
+
     def state_to_context(state : dict):
         result=""
         for message in state["messages"]:
@@ -85,7 +99,10 @@ Answer:
     def __init__(self):
         
         print("Starting initialize custom executor")
+        self.tools=[CustomExecutor.multiply]
+
         self.model = ChatOllama(model="openhermes")
+        #self.model = self.model.bind_tools(self.tools)
         self.input_node_runnable = RunnableLambda(CustomExecutor.input_node_fcn)
         self.invocation_node_runnable = RunnableLambda(partial(CustomExecutor.invocation_node_fcn, self.model))
 
@@ -109,6 +126,7 @@ Answer:
         self.app = self.workflow.compile()
 
         self.AgentState["human_input_mode"] = False
+
 
         print("Custom executor initialized")
 
