@@ -7,6 +7,8 @@ from langchain_core.prompts import PromptTemplate
 import sys, select
 from langchain_core.tools import tool
 from langchain.tools.render import render_text_description # to describe tools as a string 
+from langchain_core.prompts import ChatPromptTemplate # crafts prompts for our llm
+from langchain_core.output_parsers import JsonOutputParser # ensure JSON input for tools
 
 class CustomExecutor: 
 
@@ -20,6 +22,9 @@ class CustomExecutor:
         """Multiply two integers together."""
         return first * second
 
+    # Consider creating this tool function without the decorator, as it 
+    # creates problems with the the rendering of the tools where the args 
+    # are evaluated for rendering before being partially evaluated
     @tool
     def converse(input: str, model) -> str:
         "Provide a natural language response using the user input."
@@ -78,6 +83,20 @@ Answer:
         print("prompt:" + str(resulting_prompt))
 
         result = model.invoke(str(resulting_prompt))
+        chain = state["prompt"] | model | JsonOutputParser()
+
+        # move this to a prior chain of tool_invocation_node for choice, with only 
+        # converse tool available. with conditional edges to tool execution nodes
+        # only one tool available: converse (executed by invoke)
+
+        #print(chain.invoke({'input': 'How are you?'}))
+        #{'name': 'converse', 'arguments': {'input': 'How are you?', 'model': ''}}
+        # -> construct the converse fcn as a runnablelambda with partial evaluation ( or use pydantic)
+
+        #print(chain.invoke({'input': 'What is 3 times 23'}))
+        #{'name': 'multiply', 'arguments': {'first': 3, 'second': 23}}
+
+
         # add result content to agent state
         state['messages'].append(result.content)
         print(result)
@@ -133,8 +152,31 @@ Answer:
 
         self.AgentState["human_input_mode"] = False
 
+        self.converse_runnable  = RunnableLambda(partial(CustomExecutor.converse, self.model))
+
         self.tools = [CustomExecutor.multiply, CustomExecutor.converse, CustomExecutor.add]
+        # This is a lousy hack to get rid of the "model" arg from the converse function
+        # and is only used for "rendering" the tools for the system prompt.
+        #  Tool invocations should be nodes 
+        # unto themselves, but will do as a subchain in the model invocation node for now. 
+        #self.tools = [CustomExecutor.multiply, CustomExecutor.add]
         self.rendered_tools = render_text_description(self.tools)
+        self.system_prompt = f"""You are an assistant that has access to the following set of tools.
+Here are the names and descriptions for each tool:
+
+{self.rendered_tools}
+Given the user input, return the name and input of the tool to use.
+Return your response as a JSON blob with 'name' and 'arguments' keys.
+The value associated with the 'arguments' key should be a dictionary of parameters."""
+        
+        self.prompt =  ChatPromptTemplate.from_messages(
+            [("system", self.system_prompt), ("user", "{input}")]
+        )
+
+        # invocation node only has access to the agent state, so use 
+        # it to pass the prompt. Can be avoided with a RunnableLambda
+        # but this will do for now
+        self.AgentState["prompt"] = self.prompt
 
         print("Custom executor initialized")
 
@@ -147,7 +189,7 @@ Answer:
 def main():
     print("hello world!")
     customExecutor = CustomExecutor()
-    customExecutor.set_human_input_mode(True)
+    #customExecutor.set_human_input_mode(True)
     customExecutor.invoke()
     
 if __name__ == "__main__":
