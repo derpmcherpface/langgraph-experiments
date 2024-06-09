@@ -6,19 +6,24 @@ from functools import partial
 from langchain_core.prompts import PromptTemplate
 import sys, select
 from langchain_core.tools import tool
+from langchain.tools.render import render_text_description # to describe tools as a string 
 
 class CustomExecutor: 
 
     @tool
-    def multiply(a: int, b: int) -> int:
-        """Multiplies a and b.
+    def add(first: int, second: int) -> int:
+        "Add two integers."
+        return first + second
+    
+    @tool
+    def multiply(first: int, second: int) -> int:
+        """Multiply two integers together."""
+        return first * second
 
-        Args:
-            a: first int
-            b: second int
-        """
-        return a * b
-
+    @tool
+    def converse(input: str, model) -> str:
+        "Provide a natural language response using the user input."
+        return model.invoke(input)
 
 
     def state_to_context(state : dict):
@@ -68,6 +73,7 @@ Answer:
         context=CustomExecutor.state_to_context(state), 
         question=state['question']
         )
+        
 
         print("prompt:" + str(resulting_prompt))
 
@@ -127,6 +133,8 @@ Answer:
 
         self.AgentState["human_input_mode"] = False
 
+        self.tools = [CustomExecutor.multiply, CustomExecutor.converse, CustomExecutor.add]
+        self.rendered_tools = render_text_description(self.tools)
 
         print("Custom executor initialized")
 
