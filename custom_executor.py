@@ -57,6 +57,8 @@ class CustomExecutor:
 
     def tool_execution_node_fcn(model,state: dict):
         printr(Fore.BLUE + "running node tool_execution fcn")
+        chain = state["prompt"] | model | JsonOutputParser()
+        printr(Fore.GREEN + str(chain.invoke({'input': 'How are you?'})))
         return state
 
     def input_node_fcn(state: dict): 
