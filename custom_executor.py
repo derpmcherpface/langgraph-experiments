@@ -9,6 +9,11 @@ from langchain_core.tools import tool
 from langchain.tools.render import render_text_description # to describe tools as a string 
 from langchain_core.prompts import ChatPromptTemplate # crafts prompts for our llm
 from langchain_core.output_parsers import JsonOutputParser # ensure JSON input for tools
+from colorama import Fore, Style, Back
+
+def printr(s):
+    print(s)
+    print(Style.RESET_ALL)
 
 class CustomExecutor: 
 
@@ -51,10 +56,11 @@ class CustomExecutor:
     # static methods used as nodes in the graph
 
     def tool_execution_node_fcn(model,state: dict):
-        print("running node tool_execution fcn")
+        printr(Fore.BLUE + "running node tool_execution fcn")
         return state
 
     def input_node_fcn(state: dict): 
+        printr(Fore.BLUE + "running node input fcn")
         print("What is your question?")
         #result=input()
         if not state['input_queue'].empty():
@@ -68,7 +74,7 @@ class CustomExecutor:
         return state
     
     def invocation_node_fcn(model,state: dict):
-        print("running node invocation fcn")
+        printr(Fore.BLUE + "running node invocation fcn")
 
         prompt_template = PromptTemplate.from_template(
 """Give a short answer to the question given the context below
@@ -152,7 +158,7 @@ Answer:
 
         self.workflow.add_edge('input_node', 'tool_execution_node')
         self.workflow.add_edge('tool_execution_node', 'invocation_node')
-        
+
         self.workflow.add_conditional_edges("invocation_node", CustomExecutor.should_continue)
 
 
