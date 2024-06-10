@@ -49,6 +49,11 @@ class CustomExecutor:
             print("You said nothing!")
 
     # static methods used as nodes in the graph
+
+    def tool_execution_node_fcn(model,state: dict):
+        print("running node tool_execution fcn")
+        return state
+
     def input_node_fcn(state: dict): 
         print("What is your question?")
         #result=input()
@@ -130,6 +135,7 @@ Answer:
         #self.model = self.model.bind_tools(self.tools)
         self.input_node_runnable = RunnableLambda(CustomExecutor.input_node_fcn)
         self.invocation_node_runnable = RunnableLambda(partial(CustomExecutor.invocation_node_fcn, self.model))
+        self.tool_execution_node_runnable = RunnableLambda(partial(CustomExecutor.tool_execution_node_fcn, self.model))
 
         # messages key will be assigned as an empty array. 
         # We will append new messages as we pass along nodes.
@@ -142,7 +148,11 @@ Answer:
         self.workflow = Graph()
         self.workflow.add_node("input_node", self.input_node_runnable)
         self.workflow.add_node("invocation_node", self.invocation_node_runnable)
-        self.workflow.add_edge('input_node', 'invocation_node')
+        self.workflow.add_node("tool_execution_node", self.tool_execution_node_runnable)
+
+        self.workflow.add_edge('input_node', 'tool_execution_node')
+        self.workflow.add_edge('tool_execution_node', 'invocation_node')
+        
         self.workflow.add_conditional_edges("invocation_node", CustomExecutor.should_continue)
 
 
