@@ -55,11 +55,7 @@ class CustomExecutor:
 
     # static methods used as nodes in the graph
 
-    def tool_execution_node_fcn(model,state: dict):
-        printr(Fore.BLUE + "running node tool_execution fcn")
-        chain = state["prompt"] | model | JsonOutputParser()
-        printr(Fore.GREEN + str(chain.invoke({'input': 'How are you?'})))
-        return state
+
 
     def input_node_fcn(state: dict): 
         printr(Fore.BLUE + "running node input fcn")
@@ -73,6 +69,14 @@ class CustomExecutor:
         #CustomExecutor.input_with_timeout(10)
         state['messages'].append(result)
         state['question']=result
+        return state
+    
+    def tool_execution_node_fcn(model,state: dict):
+        printr(Fore.BLUE + "running node tool_execution fcn")
+        chain = state["prompt"] | model | JsonOutputParser()
+        result = chain.invoke({'input': state['question']})
+        printr(Fore.GREEN + str(result))
+        state['tool_selection']=result
         return state
     
     def invocation_node_fcn(model,state: dict):
@@ -203,6 +207,9 @@ The value associated with the 'arguments' key should be a dictionary of paramete
         self.add_input(input)
         result = self.invoke()
         return result
+    
+    def get_state(self) -> dict:
+        return self.AgentState
     
 def main():
     print("hello world!")

@@ -39,6 +39,13 @@ class CustomExecutorTests(unittest.TestCase):
         result= self.customExecutor.one_pass_execute("test one pass execute")
         print(result)
 
+    def test_addition_tool_selection(self):
+        self.customExecutor = CustomExecutor()
+        result= self.customExecutor.one_pass_execute("What is 1+1?")
+        state = self.customExecutor.get_state()
+        self.assertTrue(state['tool_selection']['name'] == 'add')
+        print(result)
+
     def test_one_pass_execute_default_input(self):
         self.customExecutor = CustomExecutor()
         result= self.customExecutor.one_pass_execute()
