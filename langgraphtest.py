@@ -46,6 +46,20 @@ class CustomExecutorTests(unittest.TestCase):
         self.assertTrue(state['tool_selection']['name'] == 'add')
         print(result)
 
+    def test_multiplication_tool_selection(self):
+        self.customExecutor = CustomExecutor()
+        result= self.customExecutor.one_pass_execute("What is 5 multiplied by 4?")
+        state = self.customExecutor.get_state()
+        self.assertTrue(state['tool_selection']['name'] == 'multiply')
+        print(result)
+
+    def test_converse_tool_selection(self):
+        self.customExecutor = CustomExecutor()
+        result= self.customExecutor.one_pass_execute("Hi! How are you?")
+        state = self.customExecutor.get_state()
+        self.assertTrue(state['tool_selection']['name'] == 'converse')
+        print(result)
+
     def test_one_pass_execute_default_input(self):
         self.customExecutor = CustomExecutor()
         result= self.customExecutor.one_pass_execute()
