@@ -72,6 +72,13 @@ class CustomExecutor:
         return state
     
     def tool_execution_node_fcn(model,state: dict):
+        #We can now wrap these tools in a simple LangGraph ToolNode.
+        #  This class receives the list of messages
+        #  (containing tool_calls, calls the tool(s) the LLM has requested to run,
+        #  and returns the output as new ToolMessage(s).
+
+        # -> We need to refactor invocation node to use AiMessage, HumanMessage, ToolMessage and 
+        # MessagesPlaceholder 
         printr(Fore.BLUE + "running node tool_execution fcn")
         chain = state["prompt"] | model | JsonOutputParser()
         result = chain.invoke({'input': state['question']})
