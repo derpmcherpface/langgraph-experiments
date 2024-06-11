@@ -10,6 +10,7 @@ from langchain.tools.render import render_text_description # to describe tools a
 from langchain_core.prompts import ChatPromptTemplate # crafts prompts for our llm
 from langchain_core.output_parsers import JsonOutputParser # ensure JSON input for tools
 from colorama import Fore, Style, Back
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 
 def printr(s):
     print(s)
@@ -39,7 +40,7 @@ class CustomExecutor:
     def state_to_context(state : dict):
         result=""
         for message in state["messages"]:
-            result=result+'\n'+message
+            result=result+'\n'+str(message)
 
         return result
     
@@ -63,11 +64,13 @@ class CustomExecutor:
         #result=input()
         if not state['input_queue'].empty():
             result = state['input_queue'].get()
+            print("Simulated user input: " + str(result))
         else:
             result=input()
+            print("User input: " + result)
 
         #CustomExecutor.input_with_timeout(10)
-        state['messages'].append(result)
+        state['messages'].append(HumanMessage(result))
         state['question']=result
         return state
     
@@ -87,7 +90,7 @@ class CustomExecutor:
         return state
     
     def invocation_node_fcn(model,state: dict):
-        printr(Fore.BLUE + "running node invocation fcn")
+        printr(Fore.BLUE + "running model invocation node fcn")
 
         prompt_template = PromptTemplate.from_template(
 """Give a short answer to the question given the context below
@@ -122,7 +125,7 @@ Answer:
 
 
         # add result content to agent state
-        state['messages'].append(result.content)
+        state['messages'].append(AIMessage(result.content))
         print(result)
         return state
     
@@ -212,7 +215,7 @@ The value associated with the 'arguments' key should be a dictionary of paramete
 
     def one_pass_execute(self, input: str="My carpet is green. What color is my carpet?") -> str:
         self.add_input(input)
-        result = self.invoke()
+        result = str(self.invoke())
         return result
     
     def get_state(self) -> dict:
