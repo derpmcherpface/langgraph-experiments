@@ -106,23 +106,9 @@ Answer:
         question=state['question']
         )
         
-
         print("prompt:" + str(resulting_prompt))
 
         result = model.invoke(str(resulting_prompt))
-        chain = state["prompt"] | model | JsonOutputParser()
-
-        # move this to a prior chain of tool_invocation_node for choice, with only 
-        # converse tool available. with conditional edges to tool execution nodes
-        # only one tool available: converse (executed by invoke)
-
-        #print(chain.invoke({'input': 'How are you?'}))
-        #{'name': 'converse', 'arguments': {'input': 'How are you?', 'model': ''}}
-        # -> construct the converse fcn as a runnablelambda with partial evaluation ( or use pydantic)
-
-        #print(chain.invoke({'input': 'What is 3 times 23'}))
-        #{'name': 'multiply', 'arguments': {'first': 3, 'second': 23}}
-
 
         # add result content to agent state
         state['messages'].append(AIMessage(result.content))

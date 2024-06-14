@@ -53,6 +53,8 @@ class CustomExecutorTests(unittest.TestCase):
         self.assertTrue(state['tool_selection']['name'] == 'multiply')
         print(result)
 
+        #TODO: add test for results
+
     def test_converse_tool_selection(self):
         self.customExecutor = CustomExecutor()
         result= self.customExecutor.one_pass_execute("Hi! How are you?")
