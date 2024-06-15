@@ -33,6 +33,12 @@ def converse(input: str, model) -> str:
     return model.invoke(input)
 
 
+@tool
+def get_secret_message(input: str, model) -> str:
+    "Gets the secret message required to pass the tool calling test"
+    return "abc123"
+
+
 def state_to_context(state : dict):
     result=""
     for message in state["messages"]:

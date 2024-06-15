@@ -53,6 +53,15 @@ class CustomExecutorTests(unittest.TestCase):
         self.assertTrue(state['tool_selection']['name'] == 'multiply')
         print(result)
 
+
+    def test_secret_question_tool_selection(self):
+        self.customExecutor = CustomExecutor()
+        result= self.customExecutor.one_pass_execute("What is the answer to the secret question?")
+        state = self.customExecutor.get_state()
+        print("tool selection: " + str(state['tool_selection']))
+        #self.assertTrue(state['tool_selection']['name'] == 'multiply')
+        print(result)
+
         #TODO: add test for results
 
     def test_converse_tool_selection(self):
