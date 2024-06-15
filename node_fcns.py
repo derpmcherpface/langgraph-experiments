@@ -80,7 +80,7 @@ def tool_execution_node_fcn(model,state: dict):
     # -> We need to refactor invocation node to use AiMessage, HumanMessage, ToolMessage and 
     # MessagesPlaceholder 
     printr(Fore.BLUE + "running node tool_execution fcn")
-    chain = state["prompt"] | model | JsonOutputParser()
+    chain = state["tool_selection_prompt"] | model | JsonOutputParser()
     result = chain.invoke({'input': state['question']})
     printr(Fore.GREEN + str(result))
     state['tool_selection']=result

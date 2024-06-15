@@ -80,14 +80,14 @@ Given the user input, return the name and input of the tool to use.
 Return your response as a JSON blob with 'name' and 'arguments' keys.
 The value associated with the 'arguments' key should be a dictionary of parameters."""
         
-        self.prompt =  ChatPromptTemplate.from_messages(
+        self.tool_selection_prompt =  ChatPromptTemplate.from_messages(
             [("system", self.system_prompt), ("user", "{input}")]
         )
 
         # invocation node only has access to the agent state, so use 
         # it to pass the prompt. Can be avoided with a RunnableLambda
         # but this will do for now
-        self.AgentState["prompt"] = self.prompt
+        self.AgentState["tool_selection_prompt"] = self.tool_selection_prompt
 
         print("Custom executor initialized")
 
