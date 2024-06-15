@@ -11,7 +11,7 @@ from langchain.tools.render import render_text_description # to describe tools a
 from langchain_core.prompts import ChatPromptTemplate # crafts prompts for our llm
 from langchain_core.output_parsers import JsonOutputParser # ensure JSON input for tools
 from colorama import Fore, Style, Back
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, FunctionMessage
 
 
 @tool
@@ -81,9 +81,22 @@ def tool_execution_node_fcn(model,state: dict):
     # MessagesPlaceholder 
     printr(Fore.BLUE + "running node tool_execution fcn")
     chain = state["tool_selection_prompt"] | model | JsonOutputParser()
-    result = chain.invoke({'input': state['question']})
-    printr(Fore.GREEN + str(result))
-    state['tool_selection']=result
+    tool_selection_result = chain.invoke({'input': state['question']})
+    printr(Fore.GREEN +"tool selection:" +str(tool_selection_result))
+
+    if tool_selection_result["name"] == "converse":
+        pass
+
+    elif tool_selection_result["name"] == "multiply":
+        tool_invocation_result=add.invoke(tool_selection_result["arguments"])
+        # See: https://github.com/langchain-ai/langchain/pull/22339
+        #toolMessage=ToolMessage(content=str(tool_invocation_result), tool_call_id="1")
+        toolMessage=AIMessage(content=str(tool_invocation_result))
+        state["messages"].append(toolMessage)
+        printr(Fore.RED + "chose multiply tool")
+    
+
+    state['tool_selection']=tool_selection_result
     return state
 
 def invocation_node_fcn(model,state: dict):
