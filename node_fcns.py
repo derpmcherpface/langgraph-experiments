@@ -89,27 +89,27 @@ def tool_execution_node_fcn(model,state: dict):
 def invocation_node_fcn(model,state: dict):
     printr(Fore.BLUE + "running model invocation node fcn")
 
-    prompt_template = PromptTemplate.from_template(
-"""Give a short answer to the question given the context below
----
-Context: {context}
----
-Question: {question}
-Answer:
-"""
-    )
-    resulting_prompt=prompt_template.format(
-    context=state_to_context(state), 
-    question=state['question']
-    )
-    
-    print("prompt:" + str(resulting_prompt))
+    from langchain_core.prompts import MessagesPlaceholder
+    from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-    result = model.invoke(str(resulting_prompt))
+    prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a helpful assistant. Give a short answer to the question given the context below"),
+        MessagesPlaceholder("history"),
+        ("human", "{question}")
+    ]
+    )
+
+    prompt_invocation = prompt.invoke(
+    {
+        "history": state['messages'],
+        "question": state['question']
+    }
+    )
+    result = model.invoke(prompt_invocation)
 
     # add result content to agent state
     state['messages'].append(AIMessage(result.content))
-    print(result)
     return state
 
 def should_continue(state):
