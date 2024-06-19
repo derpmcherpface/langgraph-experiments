@@ -28,9 +28,10 @@ def multiply(first: int, second: int) -> int:
     # creates problems with the the rendering of the tools where the args 
     # are evaluated for rendering before being partially evaluated
 @tool
-def converse(input: str, model) -> str:
+def converse(input: str) -> str:
     "Provide a natural language response using the user input."
-    return model.invoke(input)
+    #return model.invoke(input)
+    return "hello world!"
 
 
 @tool
