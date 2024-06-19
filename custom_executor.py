@@ -65,7 +65,7 @@ class CustomExecutor:
 
         self.converse_runnable  = RunnableLambda(partial(converse, self.model))
 
-        self.tools = [multiply, converse, add]
+        self.tools = [multiply, converse, add, get_secret_message]
         # This is a lousy hack to get rid of the "model" arg from the converse function
         # and is only used for "rendering" the tools for the system prompt.
         #  Tool invocations should be nodes 
@@ -74,12 +74,15 @@ class CustomExecutor:
         self.rendered_tools = render_text_description(self.tools)
         self.system_prompt = f"""You are an assistant that has access to the following set of tools.
 Here are the names and descriptions for each tool:
-
 {self.rendered_tools}
 Given the user input, return the name and input of the tool to use.
 Return your response as a JSON blob with 'name' and 'arguments' keys.
 The value associated with the 'arguments' key should be a dictionary of parameters."""
         
+
+        print("System prompt: " + self.system_prompt)
+
+
         self.tool_selection_prompt =  ChatPromptTemplate.from_messages(
             [("system", self.system_prompt), ("user", "{input}")]
         )
@@ -103,7 +106,7 @@ The value associated with the 'arguments' key should be a dictionary of paramete
 def main():
     print("hello world!")
     customExecutor = CustomExecutor()
-    #customExecutor.set_human_input_mode(True)
+    customExecutor.set_human_input_mode(True)
     customExecutor.invoke()
     
 if __name__ == "__main__":

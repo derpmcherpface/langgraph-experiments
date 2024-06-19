@@ -56,7 +56,7 @@ class CustomExecutorTests(unittest.TestCase):
 
     def test_secret_question_tool_selection(self):
         self.customExecutor = CustomExecutor()
-        result= self.customExecutor.one_pass_execute("What is the answer to the secret question?")
+        result= self.customExecutor.one_pass_execute("You are given the task of answering a secret question. Your are provided with tools to help you. Choose the appropriate tool to answer the question.")
         state = self.customExecutor.get_state()
         print("tool selection: " + str(state['tool_selection']))
         #self.assertTrue(state['tool_selection']['name'] == 'multiply')

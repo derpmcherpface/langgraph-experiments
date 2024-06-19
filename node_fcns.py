@@ -34,8 +34,8 @@ def converse(input: str, model) -> str:
 
 
 @tool
-def get_secret_message(input: str, model) -> str:
-    "Gets the secret message required to pass the tool calling test"
+def get_secret_message() -> str:
+    "Get the secret message"
     return "abc123"
 
 
@@ -69,6 +69,7 @@ def input_node_fcn(state: dict):
         result = state['input_queue'].get()
         print("Simulated user input: " + str(result))
     else:
+        print("Human input mode")
         result=input()
         print("User input: " + result)
 
@@ -126,7 +127,7 @@ def invocation_node_fcn(model,state: dict):
     }
     )
     result = model.invoke(prompt_invocation)
-
+    print("model invocation result: " + str(result))
     # add result content to agent state
     state['messages'].append(AIMessage(result.content))
     return state
