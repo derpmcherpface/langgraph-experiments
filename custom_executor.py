@@ -65,7 +65,8 @@ class CustomExecutor:
 
         self.converse_runnable  = RunnableLambda(partial(converse, self.model))
 
-        self.tools = [multiply, converse, add, get_secret_message]
+        #self.tools = [multiply, converse, add, get_secret_message]
+        self.tools = [multiply, add, get_secret_message]
         # This is a lousy hack to get rid of the "model" arg from the converse function
         # and is only used for "rendering" the tools for the system prompt.
         #  Tool invocations should be nodes 
